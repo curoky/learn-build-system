@@ -32,15 +32,8 @@ compile_commands.json
 ## poetry
 dist
 
-# bazel
-bazel-*
-compile_commands.json
-
-# go
-**/coverage.txt
-design-pattern/dependency_injection/wire/wire_gen.go
-lang/go/go_enum_test_enum.go
-library/thrift/tools/proxy-buffered-to-framed
+# golang
+coverage.txt
 
 # clang
 clang-analysis
