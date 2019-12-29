@@ -37,6 +37,27 @@ dist
 # golang
 coverage.txt
 
-# clang
-clang-analysis
-compile_commands.json
+# npm
+**/node_modules/*
+
+## maven
+
+## gradle
+.gradle
+tutorial/gradle/tutorial/hello/build
+
+# please
+plz-out
+
+# rust
+target/
+
+# python
+*.egg-info
+
+# scons
+.sconsign.dblite
+
+
+tutorial/pypi/pip/build
+tutorial/gradle/hello/build
