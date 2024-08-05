@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_VERSION=1
+ARG BASE_IMAGE_VERSION=2
 
 FROM curoky/infra-image:cuda11.4-cudnn8 as base_image_v1
 ENV CUDNN_INSTALL_PATH=/usr/local/cudnn8-cu11.4
@@ -9,7 +9,7 @@ ENV CUDNN_INSTALL_PATH=/usr
 FROM base_image_v$BASE_IMAGE_VERSION
 RUN apt-get update -y \
   && apt-get install -y --no-install-recommends \
-  curl gcc-10 g++-10 git python3.8 python3.8-dev python3-pip
+  curl clang-8 git python3.8 python3.8-dev python3-pip
 RUN curl -sSL -o bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.20.0/bazelisk-linux-amd64 \
   && chmod +x bazelisk \
   && mv bazelisk /usr/local/bin/bazel
@@ -19,12 +19,13 @@ RUN git clone --recurse-submodules --depth=1 -b v2.5.0 https://github.com/tensor
 WORKDIR /tensorflow
 ENV TF_CUDNN_VERSION=8 \
   TF_CUDA_VERSION=11 \
+  # TF_DOWNLOAD_CLANG=1 \
   TF_CUDA_COMPUTE_CAPABILITIES="sm_75,compute_75,sm_80,compute_80,sm_86,compute_86" \
-  GCC_HOST_COMPILER_PATH=/usr/bin/gcc-10 \
-  CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 \
+  CLANG_CUDA_COMPILER_PATH=/usr/bin/clang-8 \
+  # CC=/usr/bin/clang-10 CXX=/usr/bin/clang++-10 \
   CUDA_TOOLKIT_PATH=/usr/local/cuda-11.4
 
-# RUN echo 'startup --host_jvm_args=-Djava.net.preferIPv6Addresses=true' >> .bazelrc
+RUN echo 'startup --host_jvm_args=-Djava.net.preferIPv6Addresses=true' >> .bazelrc
 RUN pip3 install numpy==1.19.5 keras_preprocessing==1.1.2
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN bazel build //tensorflow/tools/pip_package:build_pip_package \
@@ -32,7 +33,7 @@ RUN bazel build //tensorflow/tools/pip_package:build_pip_package \
     --config=v2 \
     --config=avx_linux \
     # --config=tensorrt \
-    --config=cuda \
+    --config=cuda_clang \
     --config=noaws \
     --config=nogcp \
     --config=nohdfs \
